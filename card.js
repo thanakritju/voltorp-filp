@@ -1,47 +1,83 @@
-function Card(x,y){
-	this.pos = createVector(x,y);
-	//this.value = Math.floor(random(1)*4);
-	this.value = [1,1,1,0,0,2,3][Math.floor(Math.random()*7)];
-	// for special cards
-	this.cardsValue =0;
-	this.zeros=0;
-
-	this.showcard=function(){
-		if (this.mouseInArea()){
-			fill(255,191,0);
-		} else {
-			fill(0,191,255);
-		}
-		rect(this.pos.x,this.pos.y,32,60);
-	}
-
-	this.showspecialcard=function(){
-		fill(255);
-		rect(this.pos.x,this.pos.y,32,60);
-		fill(0);
-		textSize(15);
-		text(this.cardsValue,this.pos.x+12,this.pos.y+20);
-		fill(255,100,100);
-		text(this.zeros,this.pos.x+12,this.pos.y+50);
-	}
-
-	this.showtext=function(){
-		fill(0);
-		textSize(25);
-		text(this.value,this.pos.x+11,this.pos.y+35);
-	}
-
-	this.mouseInArea =function(){
-		if (mouseX>=this.pos.x && mouseX<=this.pos.x+30 && mouseY>=this.pos.y && mouseY<=this.pos.y+50){
-			return true;
-		} else{
-			return false;
-		}
-	}
-	this.randomvalue =function(){
-		var values=[1,1,1,0,2,3]
-		var nv =values.length
-		return values[Math.floor(Math.random()*nv)];
-	}
+class Card {
+    constructor(x,y,scale=1) {
+        // Positions of a card in the board.
+        this.x = x
+        this.y = y
+        // Width and Height of a card.
+        this.width = 30 * scale
+        this.height = 55 * scale
+    }
 }
 
+class PlayCard extends Card {
+    constructor(x,y,scale){
+        super(x,y,scale)
+        // Value of the card randomly distributed in the given array.
+        this.value = [1,1,1,0,0,2,3][Math.floor(Math.random()*7)];
+        // At start of the game, the card is flip down.
+        this.isClicked = false
+        // Text positions.
+        this.textX = this.width / 2
+        this.textValueY = this.height / 2
+    }
+    // Display using p5.js.
+    display() {
+        if (this.isClicked) {
+            // Draw a rectangle.
+            fill(255)
+            rect(this.x,this.y,this.width,this.height)
+            // Display Value
+            fill(0)
+            textAlign(CENTER)
+            text(this.value, this.x + this.textX, this.y + this.textValueY)
+        } else if (this.cursorOn()) {
+            // Do another.
+            fill(100)
+            rect(this.x,this.y,this.width,this.height)
+        } else {
+            fill(125)
+            rect(this.x,this.y,this.width,this.height)
+        }
+        
+    }
+
+
+    // Check if cursor is on the card.
+    cursorOn() { 
+        return (
+            mouseX >= this.x &&
+            mouseX <= this.x + this.width &&
+            mouseY >= this.y &&
+            mouseY <= this.y + this.height
+        ) 
+    }
+}
+
+class InfoCard extends Card {
+    constructor(x,y,scale){
+        super(x,y,scale)
+        // They must be overide when intializing the board.
+        this.zeros = 0
+        this.totalScore = 0
+
+        // Text positions.
+        this.textX = this.width / 2 
+        this.textZerosY = 50 * scale
+        this.textScoresY = 20 * scale
+    }
+    display() {
+        // Draw a rectangle.
+        fill(220)   
+        rect(this.x,this.y,this.width,this.height)
+        //define text size.
+        textSize(15)
+        textAlign(CENTER);
+        // How many zeros.
+        fill(255,100,100)
+		text(this.zeros, this.x + this.textX, this.y + this.textZerosY);
+        // Total score in row or column.
+        fill(0)
+		text(this.totalScore, this.x + this.textX, this.y + this.textScoresY);
+        
+    }
+}
